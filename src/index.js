@@ -3,42 +3,89 @@ import SimpleImageLabel from "./simpleImageLabel"
 import img from '../static/1.jpeg'
 import img2 from '../static/2.jpg'
 
+const initLabels = [{
+  color: "red",
+  height: 0.239185,
+  name: "House",
+  width: 0.200318,
+  x: 0.0333863,
+  y: 0.498728
+}, {
+  "x": 0.584722,
+  "y": 0.394444,
+  "width": 0.35,
+  "height": 0.413333,
+  "name": "Tree",
+  "color": "yellow"
+}]
+
+const nextLabels = [{
+  "x": 0.46949199999999996,
+  "y": 0.128668,
+  "width": 0.191526,
+  "height": 0.202032,
+  "name": "Grass Mud Horse",
+  "color": "blue"
+}, {
+  "x": 0.7186440000000001,
+  "y": 0.241535,
+  "width": 0.15762700000000002,
+  "height": 0.177201,
+  "name": "Grass Mud Horse",
+  "color": "blue",
+}, {
+  "x": 0.7406780000000001,
+  "y": 0.536117,
+  "width": 0.130508,
+  "height": 0.173815,
+  "name": "Duck",
+  "color": "red"
+}, {
+  "x": 0.874576,
+  "y": 0.481941,
+  "width": 0.115254,
+  "height": 0.148984,
+  "name": "Duck",
+  "color": "red"
+}, {
+  "x": 0.0338983,
+  "y": 0.574492,
+  "width": 0.111864,
+  "height": 0.13544,
+  "name": "Duck",
+  "color": "red"
+}]
+
 const imageLabelContent = new SimpleImageLabel({
   el: 'imageLabelArea',
   imageUrl: img,
-  labels: [{
-    color: "red",
-    height: 0.239185,
-    name: "房子",
-    width: 0.200318,
-    x: 0.0333863,
-    y: 0.498728
-  }],
+  labels: initLabels,
   contextmenu: (e) => { console.log(e) },
   error: (err) => { console.log(err); },
   labelClick: (label) => { console.log(label) },
 })
 
-setTimeout(() => {
+const preBtn = document.getElementById('pre-btn')
+const nextBtn = document.getElementById('next-btn')
+
+preBtn.style.display = 'none'
+
+nextBtn.onclick = () => {
+  setImageAndLabes(img2, nextLabels)
+  preBtn.style.display = 'block'
+  nextBtn.style.display = 'none'
+}
+
+preBtn.onclick = () => {
+  setImageAndLabes(img, initLabels)
+  nextBtn.style.display = 'block'
+  preBtn.style.display = 'none'
+}
+
+function setImageAndLabes(image, labels) {
   // 重设图片
-  imageLabelContent.setImage(img2, (err) => {
+  imageLabelContent.setImage(image, (err) => {
     console.log(err)
   })
-  imageLabelContent.setLabels([{
-    "x": 0.0184805,
-    "y": 0.358896,
-    "width": 0.22381900000000002,
-    "height": 0.239264,
-    "name": "图片",
-    "color": "blue"
-  }, {
-    "x": 0.283368,
-    "y": 0.7208589999999999,
-    "width": 0.441478,
-    "height": 0.116564,
-    "name": "分页",
-    "color": "red"
-  }])
-}, 10000)
-
-console.log(imageLabelContent);
+  imageLabelContent.setLabels(labels)
+}

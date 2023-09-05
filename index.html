@@ -22,11 +22,26 @@
       margin: 0;
       padding: 0;
     }
+    .btns{
+      position: relative;
+      width: 100%;
+      margin-top: 40px;
+    }
+    #pre-btn, #next-btn {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
   </style>
 </head>
 
 <body>
   <div id="imageLabelArea" class="image-label-content"></div>
+  <div class="btns">
+    <button id="pre-btn">Previous</button>
+    <button id="next-btn">Next</button>
+  </div>
 </body>
 <script src="./src/index.js" type='module'></script>
 
