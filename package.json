@@ -1,0 +1,20 @@
+{
+  "name": "simple-image-label",
+  "version": "0.0.1",
+  "description": "image label",
+  "source": "src/simpleImageLabel.js",
+  "main": "libs/simpleImageLabel.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build --no-source-maps --no-cache --detailed-report && terser libs/simpleImageLabel.js -c passes=2 --compress --mangle --output ./libs/simpleImageLabel.min.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "king6180@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "@parcel/transformer-less": "^2.9.3",
+    "less": "^4.2.0",
+    "parcel": "^2.9.3",
+    "terser": "^5.19.4"
+  }
+}
