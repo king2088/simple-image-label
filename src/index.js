@@ -2,6 +2,7 @@ import SimpleImageLabel from "./simpleImageLabel"
 
 import img from '../static/1.jpeg'
 import img2 from '../static/2.jpg'
+import img3 from '../static/3.jpg'
 
 const initLabels = [{
   color: "red",
@@ -58,7 +59,7 @@ const nextLabels = [{
 
 const imageLabelContent = new SimpleImageLabel({
   el: 'imageLabelArea',
-  imageUrl: img,
+  imageUrl: img3,
   labels: initLabels,
   contextmenu: (e) => { console.log(e) },
   error: (err) => { console.log(err); },

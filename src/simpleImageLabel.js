@@ -70,7 +70,6 @@ class SimpleImageLabel {
       const imageContent = this.imageLabelAreaEl.querySelector('.__simple-image-label__');
       if (this.imageLabelAreaEl.clientWidth >= width) {
         imageContent.style.width = width / this.imageLabelAreaEl.clientWidth * 100 + '%';
-        // imageContent.style.height = 'auto';
       } else {
         imageContent.style.width = '100%'
       }
@@ -123,15 +122,12 @@ class SimpleImageLabel {
     this.labelsContainer.onmousedown = (e) => {
       if (e.button !== 0) return; // 不是左键点击则不操作
       this.isMouseDown = true;
-      // 点击整个label时，设置激活状态
-      if (e.target.className.includes('label-item')) {
-        this.clearAllLabelActive();
-        this.setLabelActive(e.target.id);
-        this.dragListen(e.target.id);
-        return
-      }
+      const isLabelText = e.target.className.includes('label-text')
+      const isLabelItem = e.target.className.includes('label-item')
+      const isResizeDot = e.target.className.includes('resize-dot');
+      const UUID = isLabelItem ? e.target.id : e.target.parentNode.id;
       // 点击了边框上的点
-      if (e.target.className.includes('resize-dot')) {
+      if (isResizeDot) {
         labelItem = this.getLabelByUuid(e.target.parentNode.id);
         this.labelItemTemp = deepClone(labelItem);
         endPoint = {
@@ -139,7 +135,17 @@ class SimpleImageLabel {
           y: this.labelItemTemp.y + this.labelItemTemp.height
         };
         this.resizeDotName = this.getLabelDot(e);
+        this.dragListen(UUID, isLabelText);
+        this.removeDragListen();
         return;
+      } else {
+        // 点击整个label时，设置激活状态
+        if (isLabelItem || isLabelText) {
+          this.clearAllLabelActive();
+          this.setLabelActive(UUID);
+          this.dragListen(UUID, isLabelText);
+          return
+        }
       }
       const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
       const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
@@ -162,15 +168,21 @@ class SimpleImageLabel {
     }
     // 鼠标移动事件
     this.labelsContainer.onmousemove = (e) => {
-      if (e.target.className.includes('label-item')) {
-        const uuid = e.target.id
-        // labelItem.uuid = e.target.dataset.uuid;
-        if (this.isMouseDown) {
-          this.dragListen(uuid);
-        } else {
-          this.mouseEnterLabel(uuid)
-          this.dragListen(uuid);
+      const isLabelText = e.target.className.includes('label-text')
+      const isLabelItem = e.target.className.includes('label-item')
+      const isResizeDot = e.target.className.includes('resize-dot');
+      const UUID = isLabelItem ? e.target.id : e.target.parentNode.id;
+      if (!isResizeDot) {
+        if (isLabelItem || isLabelText) {
+          if (this.isMouseDown) {
+            this.dragListen(UUID, isLabelText)
+          } else {
+            this.mouseEnterLabel(UUID)
+            this.dragListen(UUID, isLabelText)
+          }
         }
+      } else {
+        this.removeDragListen(UUID, isLabelText)
       }
       const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
       const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
@@ -222,12 +234,11 @@ class SimpleImageLabel {
 
   // 根据clientX及clientY获取labelsContainer相对于body的左侧x,y点的位置
   getLabelsContainerRelativePoints() {
-    const bodyWidth = document.body.clientWidth;
-    const bodyHeight = document.body.clientHeight;
+    const labelExternalEl = document.querySelector('.__simple-image-label__')
     return {
       // body的宽高 - 当前labelsContainer容器的宽高 = labelsContainer容器外的宽高，labelsContainer容器外的宽高 / 2 = labelsContainer容器与浏览器最左侧的距离
-      x: (bodyWidth - this.labelsContainer.clientWidth) / 2,
-      y: (bodyHeight - this.labelsContainer.clientHeight) / 2
+      x: labelExternalEl.getBoundingClientRect().x,
+      y: labelExternalEl.getBoundingClientRect().y
     }
   }
 
@@ -271,6 +282,9 @@ class SimpleImageLabel {
     labelText.innerText = name;
     if (name) {
       labelText.style.display = 'block'
+      if (color) {
+        labelText.style.color = color;
+      }
     }
     labelElement.appendChild(labelText);
     this.labelsContainer.appendChild(labelElement)
@@ -297,14 +311,17 @@ class SimpleImageLabel {
     if (!label) {
       return;
     }
-    const x = labelItem.x;
-    const y = labelItem.y;
-    const width = labelItem.width;
-    const height = labelItem.height;
-    const uuid = labelItem.uuid;
-    const w = Math.abs(width);
-    const h = Math.abs(height);
+    const {
+      x,
+      y,
+      width,
+      height,
+      uuid
+    } = labelItem
+
     if (!this.resizeDotName) {
+      const w = Math.abs(width);
+      const h = Math.abs(height);
       label.style.width = decimalToPercent(width <= 0 ? 0 : w);
       label.style.height = decimalToPercent(height <= 0 ? 0 : h);
       label.style.left = decimalToPercent(x);
@@ -332,7 +349,6 @@ class SimpleImageLabel {
       }
       if (this.resizeDotName.includes('e')) {
         label.style.width = decimalToPercent(x <= 0 ? endPoint.x : endPoint.x - x);
-        labelItem.width = x <= 0 ? endPoint.x : endPoint.x - x;
       }
     }
     const attr = {
@@ -352,7 +368,9 @@ class SimpleImageLabel {
 
   setLabelByUuid(uuid, attr = {}) {
     const label = document.getElementById(uuid);
-    if (!label) { return; }
+    if (!label) {
+      return;
+    }
     const keys = Object.keys(attr);
     this.labels.forEach(item => {
       if (item.uuid === uuid) {
@@ -424,24 +442,49 @@ class SimpleImageLabel {
   // 鼠标移入label
   mouseEnterLabel(uuid) {
     const label = document.getElementById(uuid);
-    if (!label) { return; }
+    if (!label) {
+      return;
+    }
     label.style.cursor = 'default';
   }
 
   // 拖动事件
-  dragListen(uuid) {
+  dragListen(uuid, isText = false) {
     const label = document.getElementById(uuid);
     if (!label) {
       return;
+    }
+    let textEl = isText ? label.querySelector('.label-text') : null
+    if (isText) {
+      textEl.onmousedown = (e) => this.dragStart(e);
+      textEl.onmousemove = (e) => this.dragLabel(e);
+      textEl.onmouseup = (e) => this.dragEnd(e);
+      return
     }
     label.onmousedown = (e) => this.dragStart(e);
     label.onmousemove = (e) => this.dragLabel(e);
     label.onmouseup = (e) => this.dragEnd(e);
   }
 
+  removeDragListen(uuid, isText = false) {
+    const label = document.getElementById(uuid);
+    if (!label) {
+      return;
+    }
+    let textEl = isText ? label.querySelector('.label-text') : null
+    label.onmousedown = null;
+    label.onmousemove = null;
+    label.onmouseup = null;
+    if (isText) {
+      textEl.onmousedown = null
+      textEl.onmousemove = null
+      textEl.onmouseup = null
+    }
+  }
+
   // 监听拖拽事件
   dragStart(e) {
-    const label = document.getElementById(e.target.id);
+    const label = document.getElementById(e.target.id || e.target.parentNode.id);
     if (!label) {
       return;
     }
@@ -459,7 +502,7 @@ class SimpleImageLabel {
     if (!this.divLeft || !this.divTop) {
       return
     }
-    const label = document.getElementById(e.target.id);
+    const label = document.getElementById(e.target.id || e.target.parentNode.id);
     // 拖拽事件获取拖拽最终的坐标
     if (!label) {
       return;
@@ -477,18 +520,18 @@ class SimpleImageLabel {
     label.style.left = leftDistance / this.$w <= 0 ?
       0 :
       leftDistance / this.$w >= leftPointPercent ?
-        decimalToPercent(leftPointPercent) :
-        decimalToPercent(leftDistance / this.$w);
+      decimalToPercent(leftPointPercent) :
+      decimalToPercent(leftDistance / this.$w);
     label.style.top = topDistance / this.$h <= 0 ?
       0 :
       topDistance / this.$h >= topPointPercent ?
-        decimalToPercent(topPointPercent) :
-        decimalToPercent(topDistance / this.$h);
+      decimalToPercent(topPointPercent) :
+      decimalToPercent(topDistance / this.$h);
   }
 
   // 监听拖拽结束事件
   dragEnd(e) {
-    const label = document.getElementById(e.target.id);
+    const label = document.getElementById(e.target.id || e.target.parentNode.id);
     if (!label) {
       return;
     }
