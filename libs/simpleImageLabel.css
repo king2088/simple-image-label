@@ -99,10 +99,9 @@
 }
 
 .__simple-image-label__ .s-image-content .label-content .label-item .label-text {
-  color: #454545;
-  background-color: #94e96a;
-  padding: 1px 2px;
-  font-size: 14px;
+  color: #fff;
+  padding: 2px;
+  font-size: 12px;
   display: none;
   position: absolute;
   bottom: 0;

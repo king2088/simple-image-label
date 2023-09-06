@@ -248,7 +248,7 @@ class SimpleImageLabel {
     };
     this.calc(this.labelItem, this.startPoint, this.endPoint);
     // 如果开始点与结束点一样，则删除当前dom元素
-    if (isEqual(this.startPoint, this.endPoint)) {
+    if (isEqual(this.startPoint, this.endPoint) || (this.labelItem.width === 0 && this.labelItem.height === 0)) {
       this.removeLabelByUuid(this.labelItem.uuid);
     }
     // 重置

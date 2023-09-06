@@ -1,21 +1,20 @@
 import SimpleImageLabel from "./simpleImageLabel"
 
-import img from '../static/1.jpeg'
+import img from '../static/1.jpg'
 import img2 from '../static/2.jpg'
-import img3 from '../static/3.jpg'
 
 const initLabels = [{
-  color: "red",
-  height: 0.239185,
-  name: "House",
-  width: 0.200318,
-  x: 0.0333863,
-  y: 0.498728
+  "color": "red",
+  "height": 0.251473,
+  "name": "House",
+  "width": 0.200318,
+  "x": 0.0309278,
+  "y": 0.532417,
 }, {
-  "x": 0.584722,
-  "y": 0.394444,
-  "width": 0.35,
-  "height": 0.413333,
+  "x": 0.588202,
+  "y": 0.42436100000000004,
+  "width": 0.37571599999999994,
+  "height": 0.453832,
   "name": "Tree",
   "color": "yellow"
 }]
@@ -59,11 +58,17 @@ const nextLabels = [{
 
 const imageLabelContent = new SimpleImageLabel({
   el: 'imageLabelArea',
-  imageUrl: img3,
+  imageUrl: img,
   labels: initLabels,
-  contextmenu: (e) => { console.log(e) },
-  error: (err) => { console.log(err); },
-  labelClick: (label) => { console.log(label) },
+  contextmenu: (e) => {
+    console.log(e)
+  },
+  error: (err) => {
+    console.log(err);
+  },
+  labelClick: (label) => {
+    console.log(label)
+  },
 })
 
 const preBtn = document.getElementById('pre-btn')

@@ -4,4 +4,4 @@ Simple image label, support YOLO label point
 
 ## Preview
 
-![preview](preview.jpg)
+![preview](preview.png)
