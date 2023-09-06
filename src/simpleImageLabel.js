@@ -1,7 +1,7 @@
 'use strict'
 import {
   deepClone,
-  uuid,
+  uuidGenerate,
   isEqual,
   percentOrPixelToDecimal,
   decimalToPercent,
@@ -12,25 +12,46 @@ import './style.less'
 
 class SimpleImageLabel {
   constructor(options) {
-    this.imageLabelAreaEl = document.getElementById(options.el || 'imageLabelArea'); // 默认图片标注区域
-    this.imageUrl = options.imageUrl; // 图片路径
-    this.labels = options.labels || []; // 标签集合
-    this.isMouseDown = false; // 鼠标按下时
-    this.resizeDotClasses = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se']; // 上，下，左，右，左上，右上，左下， 右下
-    this.resizeDotName = null;
-    this.labelItemTemp = null;
-    this.startPointTemp = null;
-    this.divLeft = null;
-    this.divTop = null;
+    // 默认图片标注区域
+    this.imageLabelAreaEl = document.getElementById(options.el || 'imageLabelArea');
+    // 图片路径
+    this.imageUrl = options.imageUrl;
+    // 标签集合
+    this.labels = options.labels || [];
+    // label被左键点击的回调
+    this.labelClick = options.labelClick;
+    // label右键点击回调
+    this.contextmenu = options.contextmenu;
+    // 发生错误的回调
+    this.error = options.error;
+    // 鼠标按下时
+    this.isMouseDown = false;
+    // labels容器，即id为labelsContainer的div
     this.labelsContainer = null
     this.defaultZIndex = 0;
+    // labelsContainer的真实宽高
     this.$w = 0;
     this.$h = 0;
+    // 8个缩放点
+    this.resizeDotClasses = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se']; // 上，下，左，右，左上，右上，左下， 右下
+    this.resizeDotName = null; // 当前被点击的点名称
+    // 新建的label
+    this.labelItem = null
+    this.labelItemTemp = null;
+    // 开始及结束点
+    this.startPoint = null
+    this.startPointTemp = null;
+    this.endPoint = null
+    // 当前label相对于labelsContainer左上顶点的位置
+    this.labelRelativePointContainer = {
+      x: null,
+      y: null
+    }
+    // 当前被激活的label的uuid
     this.activeUuid = null;
-    this.error = options.error;
-    this.contextmenu = options.contextmenu
-    this.imageInfo = null
-    this.labelClick = options.labelClick
+    // 图片详情 {width} {height}
+    this.imageInfo = null;
+
     this.init();
   }
 
@@ -62,6 +83,7 @@ class SimpleImageLabel {
     this.initLabelElement()
   }
 
+  // 根据图片进行缩放宽度，如果图片宽度小于当前可视区域则__simple-image-label__宽度就 = 图片宽度，否则为100%
   resizeImage() {
     const setImg = () => {
       const {
@@ -69,7 +91,7 @@ class SimpleImageLabel {
       } = this.imageInfo;
       const imageContent = this.imageLabelAreaEl.querySelector('.__simple-image-label__');
       if (this.imageLabelAreaEl.clientWidth >= width) {
-        imageContent.style.width = width / this.imageLabelAreaEl.clientWidth * 100 + '%';
+        imageContent.style.width = decimalToPercent(width / this.imageLabelAreaEl.clientWidth);
       } else {
         imageContent.style.width = '100%'
       }
@@ -92,7 +114,7 @@ class SimpleImageLabel {
     this.labels.forEach(label => {
       // 初始化uuid
       if (!label.uuid) {
-        label.uuid = uuid()
+        label.uuid = uuidGenerate()
       }
       this.createLabelElement(label);
     })
@@ -102,15 +124,15 @@ class SimpleImageLabel {
   labelAreaEvent() {
     this.$w = this.labelsContainer.clientWidth;
     this.$h = this.labelsContainer.clientHeight;
-    let startPoint = {
+    this.startPoint = {
       x: 0,
       y: 0
     };
-    let endPoint = {
+    this.endPoint = {
       x: 0,
       y: 0
     };
-    let labelItem = {
+    this.labelItem = {
       uuid: '',
       x: 0,
       y: 0,
@@ -119,117 +141,121 @@ class SimpleImageLabel {
       name: '',
       color: ''
     };
-    this.labelsContainer.onmousedown = (e) => {
-      if (e.button !== 0) return; // 不是左键点击则不操作
-      this.isMouseDown = true;
-      const isLabelText = e.target.className.includes('label-text')
-      const isLabelItem = e.target.className.includes('label-item')
-      const isResizeDot = e.target.className.includes('resize-dot');
-      const UUID = isLabelItem ? e.target.id : e.target.parentNode.id;
-      // 点击了边框上的点
-      if (isResizeDot) {
-        labelItem = this.getLabelByUuid(e.target.parentNode.id);
-        this.labelItemTemp = deepClone(labelItem);
-        endPoint = {
-          x: this.labelItemTemp.x + this.labelItemTemp.width,
-          y: this.labelItemTemp.y + this.labelItemTemp.height
-        };
-        this.resizeDotName = this.getLabelDot(e);
-        this.dragListen(UUID, isLabelText);
-        this.removeDragListen();
-        return;
-      } else {
-        // 点击整个label时，设置激活状态
-        if (isLabelItem || isLabelText) {
-          this.clearAllLabelActive();
-          this.setLabelActive(UUID);
-          this.dragListen(UUID, isLabelText);
-          return
-        }
-      }
-      const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
-      const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
-      let x = clientLeft / this.$w; // 转换为百分比
-      let y = clientTop / this.$h;
-      startPoint = {
-        x,
-        y
-      };
-      if (!this.startPointTemp) {
-        this.startPointTemp = deepClone(startPoint);
-      }
-      // 设置labelItem
-      labelItem.uuid = uuid();
-      labelItem.x = x;
-      labelItem.y = y;
-      labelItem.width = 0;
-      labelItem.height = 0;
-      this.createLabelElement(labelItem);
-    }
+    this.labelsContainer.onmousedown = (e) => this.mousedown(e)
     // 鼠标移动事件
-    this.labelsContainer.onmousemove = (e) => {
-      const isLabelText = e.target.className.includes('label-text')
-      const isLabelItem = e.target.className.includes('label-item')
-      const isResizeDot = e.target.className.includes('resize-dot');
-      const UUID = isLabelItem ? e.target.id : e.target.parentNode.id;
-      if (!isResizeDot) {
-        if (isLabelItem || isLabelText) {
-          if (this.isMouseDown) {
-            this.dragListen(UUID, isLabelText)
-          } else {
-            this.mouseEnterLabel(UUID)
-            this.dragListen(UUID, isLabelText)
-          }
-        }
-      } else {
-        this.removeDragListen(UUID, isLabelText)
-      }
-      const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
-      const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
-      let x = clientLeft / this.$w;
-      let y = clientTop / this.$h;
-      endPoint = {
-        x,
-        y
-      };
-      if (labelItem.uuid) {
-        this.calc(labelItem, startPoint, endPoint);
-      }
-    }
+    this.labelsContainer.onmousemove = (e) => this.mousemove(e)
     // 鼠标抬起事件
-    this.labelsContainer.onmouseup = (e) => {
-      const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
-      const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
-      let x = clientLeft / this.$w;
-      let y = clientTop / this.$h;
-      endPoint = {
-        x,
-        y
-      };
-      this.calc(labelItem, startPoint, endPoint);
-      // 如果开始点与结束点一样，则删除当前dom元素
-      if (isEqual(startPoint, endPoint)) {
-        this.removeLabelByUuid(labelItem.uuid);
-      }
-      // 重置
-      labelItem = {};
-      this.isMouseDown = false;
-      this.resizeDotName = null;
-      this.labelItemTemp = null;
-    }
-
+    this.labelsContainer.onmouseup = (e) => this.mouseup(e)
     // 右键点击
     this.labelsContainer.oncontextmenu = (e) => {
       e.preventDefault();
       this.contextmenu(e)
     }
-
     // 监听浏览器缩放,改变label的宽高
     window.addEventListener('resize', (e) => {
       this.$w = this.labelsContainer.clientWidth;
       this.$h = this.labelsContainer.clientHeight;
       this.resizeImage()
     })
+  }
+
+  mousedown(e) {
+    if (e.button !== 0) return; // 不是左键点击则不操作
+    this.isMouseDown = true;
+    const isLabelText = e.target.className.includes('label-text')
+    const isLabelItem = e.target.className.includes('label-item')
+    const isResizeDot = e.target.className.includes('resize-dot');
+    const uuid = isLabelItem ? e.target.id : e.target.parentNode.id;
+    // 点击了边框上的点
+    if (isResizeDot) {
+      this.labelItem = this.getLabelByUuid(e.target.parentNode.id);
+      this.labelItemTemp = deepClone(this.labelItem);
+      this.endPoint = {
+        x: this.labelItemTemp.x + this.labelItemTemp.width,
+        y: this.labelItemTemp.y + this.labelItemTemp.height
+      };
+      this.resizeDotName = this.getLabelDot(e);
+      this.dragListen(uuid, isLabelText);
+      this.removeDragListen();
+      return;
+    } else {
+      // 点击整个label时，设置激活状态
+      if (isLabelItem || isLabelText) {
+        this.clearAllLabelActive();
+        this.setLabelActive(uuid);
+        this.dragListen(uuid, isLabelText);
+        return
+      }
+    }
+    const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
+    const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
+    let x = clientLeft / this.$w; // 转换为百分比
+    let y = clientTop / this.$h;
+    this.startPoint = {
+      x,
+      y
+    };
+    if (!this.startPointTemp) {
+      this.startPointTemp = deepClone(this.startPoint);
+    }
+    // 设置labelItem
+    this.labelItem.uuid = uuidGenerate();
+    this.labelItem.x = x;
+    this.labelItem.y = y;
+    this.labelItem.width = 0;
+    this.labelItem.height = 0;
+    this.createLabelElement(this.labelItem);
+  }
+
+  mousemove(e) {
+    const isLabelText = e.target.className.includes('label-text')
+    const isLabelItem = e.target.className.includes('label-item')
+    const isResizeDot = e.target.className.includes('resize-dot');
+    const uuid = isLabelItem ? e.target.id : e.target.parentNode.id;
+    if (!isResizeDot) {
+      if (isLabelItem || isLabelText) {
+        if (this.isMouseDown) {
+          this.dragListen(uuid, isLabelText)
+        } else {
+          this.mouseEnterLabel(uuid)
+          this.dragListen(uuid, isLabelText)
+        }
+      }
+    } else {
+      this.removeDragListen(uuid, isLabelText)
+    }
+    const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
+    const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
+    let x = clientLeft / this.$w;
+    let y = clientTop / this.$h;
+    this.endPoint = {
+      x,
+      y
+    };
+    if (this.labelItem.uuid) {
+      this.calc(this.labelItem, this.startPoint, this.endPoint);
+    }
+  }
+
+  mouseup(e) {
+    const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
+    const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
+    let x = clientLeft / this.$w;
+    let y = clientTop / this.$h;
+    this.endPoint = {
+      x,
+      y
+    };
+    this.calc(this.labelItem, this.startPoint, this.endPoint);
+    // 如果开始点与结束点一样，则删除当前dom元素
+    if (isEqual(this.startPoint, this.endPoint)) {
+      this.removeLabelByUuid(this.labelItem.uuid);
+    }
+    // 重置
+    this.labelItem = {};
+    this.isMouseDown = false;
+    this.resizeDotName = null;
+    this.labelItemTemp = null;
   }
 
   // 根据clientX及clientY获取labelsContainer相对于body的左侧x,y点的位置
@@ -489,8 +515,8 @@ class SimpleImageLabel {
       return;
     }
     label.style.cursor = 'move';
-    this.divLeft = e.pageX - label.offsetLeft;
-    this.divTop = e.pageY - label.offsetTop;
+    this.labelRelativePointContainer.x = e.pageX - label.offsetLeft;
+    this.labelRelativePointContainer.y = e.pageY - label.offsetTop;
     this.defaultZIndex = label.style.zIndex;
     // 将选中的label的z-index设置为最高
     label.style.zIndex = 100;
@@ -499,7 +525,7 @@ class SimpleImageLabel {
   // 拖拽label
   dragLabel(e) {
     e.preventDefault()
-    if (!this.divLeft || !this.divTop) {
+    if (!this.labelRelativePointContainer.x || !this.labelRelativePointContainer.y) {
       return
     }
     const label = document.getElementById(e.target.id || e.target.parentNode.id);
@@ -515,8 +541,8 @@ class SimpleImageLabel {
 
     const leftPointPercent = 1 - currentLabelWidth; // 原label div 左侧的点与x轴0点的距离
     const topPointPercent = 1 - currentLabelHeight; // 原label div 顶部的点与y轴0点的距离
-    const leftDistance = e.pageX - this.divLeft; // 根据移动，计算当前label div的左侧距离x轴0点的距离
-    const topDistance = e.pageY - this.divTop; // 根据移动，计算当前label div的顶部的距离y轴0点的距离
+    const leftDistance = e.pageX - this.labelRelativePointContainer.x; // 根据移动，计算当前label div的左侧距离x轴0点的距离
+    const topDistance = e.pageY - this.labelRelativePointContainer.y; // 根据移动，计算当前label div的顶部的距离y轴0点的距离
     label.style.left = leftDistance / this.$w <= 0 ?
       0 :
       leftDistance / this.$w >= leftPointPercent ?
@@ -542,8 +568,8 @@ class SimpleImageLabel {
         item.y = percentOrPixelToDecimal(label.style.top)
       }
     })
-    this.divLeft = null
-    this.divTop = null
+    this.labelRelativePointContainer.x = null
+    this.labelRelativePointContainer.y = null
     // 恢复label的z-index
     label.style.zIndex = this.defaultZIndex;
   }
