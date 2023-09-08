@@ -1,0 +1,69 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\DELL\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js start
+
+PATH: 
+  C:\Program Files\Eclipse Adoptium\jdk-17.0.7.7-hotspot\bin;D:\Program Files (x86)\VMware\VMware Player\bin\;C:\Python27\Scripts;C:\Python27\;C:\Python310\Scripts;C:\Python310\;C:\Windows\system32;C:\Windows;D:\flutter\bin;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\ProgramData\chocolatey\bin;C:\Program Files\dotnet\;C:\Users\DELL\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\jdk-11\bin;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files (x86)\GtkSharp\2.12\bin;C:\Users\DELL\AppData\Local\Microsoft\WindowsApps;C:\Users\DELL\AppData\Roaming\npm;C:\Users\DELL\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\DELL\.dotnet\tools;c:\Users\DELL\AppData\Local\Programs\cursor\resources\app\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Users\DELL\AppData\Local\Microsoft\WindowsApps;C:\Users\DELL\AppData\Roaming\npm;C:\Users\DELL\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\DELL\.dotnet\tools;C:\Users\DELL\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Users\DELL\.dotnet\tools;C:\Users\DELL\AppData\Local\Microsoft\WindowsApps;
+
+Yarn version: 
+  1.22.18
+
+Node version: 
+  16.14.2
+
+Platform: 
+  win32 x64
+
+Trace: 
+  SyntaxError: F:\simple-image-label\package.json: Unexpected token / in JSON at position 187
+      at JSON.parse (<anonymous>)
+      at C:\Users\DELL\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (C:\Users\DELL\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:310:30)
+      at C:\Users\DELL\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "simple-image-label",
+    "private": false,
+    "version": "0.0.4",
+    "description": "image label",
+    "source": "src/simpleImageLabel.js",
+    "main": "libs/simpleImageLabel.js",
+    // "targets": { "main": false },
+    "scripts": {
+      "start": "parcel index.html",
+      "build": "parcel build --no-source-maps --no-cache --detailed-report && terser libs/simpleImageLabel.js -c passes=2 --compress --mangle --output ./libs/simpleImageLabel.js",
+      "build:html": "parcel build index.html --dist-dir html --no-source-maps --no-cache --detailed-report",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "king6180@gmail.com",
+    "license": "MIT",
+    "devDependencies": {
+      "@parcel/transformer-less": "^2.9.3",
+      "less": "^4.2.0",
+      "parcel": "^2.9.3",
+      "terser": "^5.19.4"
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/king2088/simple-image-label.git"
+    },
+    "bugs": {
+      "url": "https://github.com/king2088/simple-image-label/issues"
+    },
+    "homepage": "https://github.com/king2088/simple-image-label",
+    "keywords": [
+      "image",
+      "label",
+      "image label",
+      "YOLO",
+      "object detection",
+      "deep-learning"
+    ]
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

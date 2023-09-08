@@ -2,12 +2,14 @@
   "name": "simple-image-label",
   "private": false,
   "version": "0.0.4",
-  "description": "image label",
+  "description": "Javascript image label, use in deep learning",
   "source": "src/simpleImageLabel.js",
   "main": "libs/simpleImageLabel.js",
+  "module": "libs/simpleImageLabel.module.js",
   "scripts": {
     "start": "parcel index.html",
     "build": "parcel build --no-source-maps --no-cache --detailed-report && terser libs/simpleImageLabel.js -c passes=2 --compress --mangle --output ./libs/simpleImageLabel.js",
+    "build:html": "parcel build index.html --dist-dir html --no-source-maps --no-cache --detailed-report",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "king6180@gmail.com",
