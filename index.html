@@ -15,7 +15,7 @@
     .image-label-content {
       width: 100%;
       height: 100%;
-      display: flex;
+      /* display: flex; */
       justify-content: center;
       align-items: center;
       user-select: none;
@@ -24,9 +24,9 @@
     }
 
     .btns {
-      position: relative;
       width: 100%;
-      margin-top: 20px;
+      position: relative;
+      height: 28px;
     }
 
     #pre-btn,
@@ -36,6 +36,18 @@
       top: 50%;
       transform: translate(-50%, -50%);
     }
+    .coord {
+      font-size: 12px;
+      text-align: center;
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+    #default-coord {
+      color: #929292;  
+    }
+    #yolo-coord{
+      color: rgb(18, 182, 127);
+    }
   </style>
 </head>
 
@@ -44,6 +56,10 @@
   <div class="btns">
     <button id="pre-btn">Previous</button>
     <button id="next-btn">Next</button>
+  </div>
+  <div class="coord">
+    <div id="default-coord"></div>
+    <div id="yolo-coord"></div>
   </div>
 </body>
 <script src="./src/index.js" type='module'></script>

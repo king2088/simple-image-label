@@ -72,6 +72,13 @@ const imageLabelContent = new SimpleImageLabel({
     console.log('All labels coord : ', coord)
     const yoloCoord = imageLabelContent.getLabelsYoloCoordinate()
     console.log('All YOLO coord : ', yoloCoord);
+
+    const defaultCoordEl = document.getElementById('default-coord')
+    const yoloCoordEl = document.getElementById('yolo-coord')
+    const currentLabelCoord = imageLabelContent.getCoordinate(label)
+    const currentYoloCoord = imageLabelContent.convertToYoloCoordinate(label)
+    defaultCoordEl.innerText = '默认坐标：' + JSON.stringify(currentLabelCoord)
+    yoloCoordEl.innerText = 'YOLO坐标：' + JSON.stringify(currentYoloCoord)
   },
 })
 
