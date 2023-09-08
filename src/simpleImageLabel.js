@@ -401,6 +401,7 @@ class SimpleImageLabel {
     if (!label) {
       return;
     }
+    const labelNameEl = label.querySelector('.label-text');
     const keys = Object.keys(attr);
     this.labels.forEach(item => {
       if (item.uuid === uuid) {
@@ -408,11 +409,12 @@ class SimpleImageLabel {
           if (Object.hasOwn(item, key)) {
             item[key] = attr[key];
             if (item.name) {
-              const labelName = label.querySelector('.label-text');
-              labelName.style.display = 'block';
+              labelNameEl.style.display = 'block';
+              labelNameEl.innerText = item.name;
             }
             if (item.color) {
               label.style.borderColor = item.color;
+              labelNameEl.style.color = item.color;
             }
           }
         })
@@ -426,6 +428,9 @@ class SimpleImageLabel {
     this.labels = Object.assign([], this.labels.filter(item => item.uuid !== uuid));
     if (label) {
       label.parentNode.removeChild(label);
+    }
+    if (this.labelClick && typeof this.labelClick === 'function') {
+      this.labelClick(null);
     }
   }
 

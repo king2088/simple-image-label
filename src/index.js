@@ -3,6 +3,12 @@ import SimpleImageLabel from "./simpleImageLabel"
 import img from '../static/1.jpg'
 import img2 from '../static/2.jpg'
 
+const preBtn = document.getElementById('pre-btn')
+const nextBtn = document.getElementById('next-btn')
+const deleteBtn = document.getElementById('delete-btn')
+const setNameBtn = document.getElementById('set-name-btn')
+const setColorBtn = document.getElementById('set-color-btn')
+
 const initLabels = [{
   "color": "red",
   "height": 0.251473,
@@ -55,51 +61,86 @@ const nextLabels = [{
   "name": "Duck",
   "color": "red"
 }]
-
+let currentLabel = null
 const imageLabelContent = new SimpleImageLabel({
   el: 'imageLabelArea',
   imageUrl: img,
   labels: initLabels,
   contextmenu: (e) => {
-    
+
   },
   error: (err) => {
     console.log(err);
   },
   labelClick: (label) => {
+    currentLabel = label
+    const defaultCoordEl = document.getElementById('default-coord')
+    const yoloCoordEl = document.getElementById('yolo-coord')
+    if(!label) {
+      deleteBtn.disabled = true
+      setNameBtn.disabled = true
+      setColorBtn.disabled = true
+      defaultCoordEl.innerText = ''
+      yoloCoordEl.innerText = ''
+      return
+    }
+
     console.log('Current clicked label : ', label);
     const coord = imageLabelContent.getLabelsCoordinate()
     console.log('All labels coord : ', coord)
     const yoloCoord = imageLabelContent.getLabelsYoloCoordinate()
     console.log('All YOLO coord : ', yoloCoord);
-
-    const defaultCoordEl = document.getElementById('default-coord')
-    const yoloCoordEl = document.getElementById('yolo-coord')
+    
     const currentLabelCoord = imageLabelContent.getCoordinate(label)
     const currentYoloCoord = imageLabelContent.convertToYoloCoordinate(label)
     defaultCoordEl.innerText = '默认坐标：' + JSON.stringify(currentLabelCoord)
     yoloCoordEl.innerText = 'YOLO坐标：' + JSON.stringify(currentYoloCoord)
+    deleteBtn.disabled = false
+    setNameBtn.disabled = false
+    setColorBtn.disabled = false
   },
 })
 
-const preBtn = document.getElementById('pre-btn')
-const nextBtn = document.getElementById('next-btn')
+
+deleteBtn.disabled = true
+setNameBtn.disabled = true
+setColorBtn.disabled = true
 
 preBtn.style.display = 'none'
 
 nextBtn.onclick = () => {
-  setImageAndLabes(img2, nextLabels)
+  setImageAndLabels(img2, nextLabels)
   preBtn.style.display = 'block'
   nextBtn.style.display = 'none'
 }
 
 preBtn.onclick = () => {
-  setImageAndLabes(img, initLabels)
+  setImageAndLabels(img, initLabels)
   nextBtn.style.display = 'block'
   preBtn.style.display = 'none'
 }
 
-function setImageAndLabes(image, labels) {
+deleteBtn.onclick = () => {
+  if (currentLabel) {
+    imageLabelContent.removeLabelByUuid(currentLabel.uuid)
+  }
+}
+
+setNameBtn.onclick = () => {
+  const name = window.prompt("设置当前label名称")
+  if (name) {
+    imageLabelContent.setLabelByUuid(currentLabel.uuid, {name})
+  }
+}
+
+setColorBtn.onclick = () => {
+  const color = window.prompt("设置当前label颜色")
+  if (color) {
+    imageLabelContent.setLabelByUuid(currentLabel.uuid, {color})
+  }
+}
+
+function setImageAndLabels(image, labels) {
   // 重设图片
   imageLabelContent.setImage(image, (err) => {
     console.log(err)
