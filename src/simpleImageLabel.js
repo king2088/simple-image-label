@@ -406,17 +406,17 @@ class SimpleImageLabel {
     this.labels.forEach(item => {
       if (item.uuid === uuid) {
         keys.forEach(key => {
-          if (Object.hasOwn(item, key)) {
-            item[key] = attr[key];
-            if (item.name) {
-              labelNameEl.style.display = 'block';
-              labelNameEl.innerText = item.name;
-            }
-            if (item.color) {
-              label.style.borderColor = item.color;
-              labelNameEl.style.color = item.color;
-            }
+          // if (Object.hasOwn(item, key)) {
+          item[key] = attr[key];
+          if (item.name) {
+            labelNameEl.style.display = 'block';
+            labelNameEl.innerText = item.name;
           }
+          if (item.color) {
+            label.style.borderColor = item.color;
+            labelNameEl.style.color = item.color;
+          }
+          // }
         })
       }
     })
