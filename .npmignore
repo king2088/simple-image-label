@@ -15,6 +15,7 @@ static/
 *.html
 *.gif
 *.md
+*.png
 tsconfig.json
 tsconfig.node.json
 vite.config.ts
