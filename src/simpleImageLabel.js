@@ -27,7 +27,7 @@ class SimpleImageLabel {
     // 鼠标按下时
     this.isMouseDown = false;
     // labels容器，即id为labelsContainer的div
-    this.labelsContainer = null
+    this.labelsContainer = null;
     this.defaultZIndex = 0;
     // labelsContainer的真实宽高
     this.$w = 0;
@@ -36,17 +36,17 @@ class SimpleImageLabel {
     this.resizeDotClasses = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se']; // 上，下，左，右，左上，右上，左下， 右下
     this.resizeDotName = null; // 当前被点击的点名称
     // 新建的label
-    this.labelItem = null
+    this.labelItem = null;
     this.labelItemTemp = null;
     // 开始及结束点
-    this.startPoint = null
+    this.startPoint = null;
     this.startPointTemp = null;
-    this.endPoint = null
+    this.endPoint = null;
     // 当前label相对于labelsContainer左上顶点的位置
     this.labelRelativePointContainer = {
       x: null,
       y: null
-    }
+    };
     // 当前被激活的label的uuid
     this.activeUuid = null;
     // 图片详情 {width} {height}
@@ -56,7 +56,7 @@ class SimpleImageLabel {
   }
 
   init() {
-    this.imageInfo = null
+    this.imageInfo = null;
     if (!this.labelsContainer) {
       // 初始化创建DOM元素
       this.imageLabelAreaEl.innerHTML = `
@@ -74,13 +74,15 @@ class SimpleImageLabel {
     }
     img.onload = () => {
       this.labelAreaEvent();
-      this.resizeImage()
+      this.resizeImage();
     }
     img.onerror = (err) => {
-      this.error(err)
+      if (this.error && typeof this.error === 'function') {
+        this.error(err);
+      }
     }
     this.labelsContainer = document.getElementById('labelsContainer');
-    this.initLabelElement()
+    this.initLabelElement();
   }
 
   // 根据图片进行缩放宽度，如果图片宽度小于当前可视区域则__simple-image-label__宽度就 = 图片宽度，否则为100%
@@ -93,19 +95,19 @@ class SimpleImageLabel {
       if (this.imageLabelAreaEl.clientWidth >= width) {
         imageContent.style.width = decimalToPercent(width / this.imageLabelAreaEl.clientWidth);
       } else {
-        imageContent.style.width = '100%'
+        imageContent.style.width = '100%';
       }
       this.$w = this.labelsContainer.clientWidth;
       this.$h = this.labelsContainer.clientHeight;
     }
     if (this.imageInfo) {
-      setImg()
-      return
+      setImg();
+      return;
     }
     // 获取图片原始宽高
     getImageInfo(this.imageUrl).then(res => {
-      this.imageInfo = res
-      setImg()
+      this.imageInfo = res;
+      setImg();
     })
   }
 
@@ -114,7 +116,7 @@ class SimpleImageLabel {
     this.labels.forEach(label => {
       // 初始化uuid
       if (!label.uuid) {
-        label.uuid = uuidGenerate()
+        label.uuid = uuidGenerate();
       }
       this.createLabelElement(label);
     })
@@ -141,29 +143,31 @@ class SimpleImageLabel {
       name: '',
       color: ''
     };
-    this.labelsContainer.onmousedown = (e) => this.mousedown(e)
+    this.labelsContainer.onmousedown = (e) => this.mousedown(e);
     // 鼠标移动事件
-    this.labelsContainer.onmousemove = (e) => this.mousemove(e)
+    this.labelsContainer.onmousemove = (e) => this.mousemove(e);
     // 鼠标抬起事件
-    this.labelsContainer.onmouseup = (e) => this.mouseup(e)
+    this.labelsContainer.onmouseup = (e) => this.mouseup(e);
     // 右键点击
     this.labelsContainer.oncontextmenu = (e) => {
       e.preventDefault();
-      this.contextmenu(e)
-    }
+      if (this.contextmenu && typeof this.contextmenu === 'function') {
+        this.contextmenu(e)
+      }
+    };
     // 监听浏览器缩放,改变label的宽高
     window.addEventListener('resize', (e) => {
       this.$w = this.labelsContainer.clientWidth;
       this.$h = this.labelsContainer.clientHeight;
-      this.resizeImage()
+      this.resizeImage();
     })
   }
 
   mousedown(e) {
     if (e.button !== 0) return; // 不是左键点击则不操作
     this.isMouseDown = true;
-    const isLabelText = e.target.className.includes('label-text')
-    const isLabelItem = e.target.className.includes('label-item')
+    const isLabelText = e.target.className.includes('label-text');
+    const isLabelItem = e.target.className.includes('label-item');
     const isResizeDot = e.target.className.includes('resize-dot');
     const uuid = isLabelItem ? e.target.id : e.target.parentNode.id;
     // 点击了边框上的点
@@ -184,11 +188,11 @@ class SimpleImageLabel {
         this.clearAllLabelActive();
         this.setLabelActive(uuid);
         this.dragListen(uuid, isLabelText);
-        return
+        return;
       }
     }
-    const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
-    const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
+    const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x;
+    const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y;
     let x = clientLeft / this.$w; // 转换为百分比
     let y = clientTop / this.$h;
     this.startPoint = {
@@ -208,24 +212,24 @@ class SimpleImageLabel {
   }
 
   mousemove(e) {
-    const isLabelText = e.target.className.includes('label-text')
-    const isLabelItem = e.target.className.includes('label-item')
+    const isLabelText = e.target.className.includes('label-text');
+    const isLabelItem = e.target.className.includes('label-item');
     const isResizeDot = e.target.className.includes('resize-dot');
     const uuid = isLabelItem ? e.target.id : e.target.parentNode.id;
     if (!isResizeDot) {
       if (isLabelItem || isLabelText) {
         if (this.isMouseDown) {
-          this.dragListen(uuid, isLabelText)
+          this.dragListen(uuid, isLabelText);
         } else {
-          this.mouseEnterLabel(uuid)
-          this.dragListen(uuid, isLabelText)
+          this.mouseEnterLabel(uuid);
+          this.dragListen(uuid, isLabelText);
         }
       }
     } else {
-      this.removeDragListen(uuid, isLabelText)
+      this.removeDragListen(uuid, isLabelText);
     }
-    const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
-    const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
+    const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x;
+    const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y;
     let x = clientLeft / this.$w;
     let y = clientTop / this.$h;
     this.endPoint = {
@@ -238,8 +242,8 @@ class SimpleImageLabel {
   }
 
   mouseup(e) {
-    const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x
-    const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y
+    const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x;
+    const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y;
     let x = clientLeft / this.$w;
     let y = clientTop / this.$h;
     this.endPoint = {
@@ -260,12 +264,12 @@ class SimpleImageLabel {
 
   // 根据clientX及clientY获取labelsContainer相对于body的左侧x,y点的位置
   getLabelsContainerRelativePoints() {
-    const labelExternalEl = document.querySelector('.__simple-image-label__')
+    const labelExternalEl = document.querySelector('.__simple-image-label__');
     return {
       // body的宽高 - 当前labelsContainer容器的宽高 = labelsContainer容器外的宽高，labelsContainer容器外的宽高 / 2 = labelsContainer容器与浏览器最左侧的距离
       x: labelExternalEl.getBoundingClientRect().x,
       y: labelExternalEl.getBoundingClientRect().y
-    }
+    };
   }
 
   createLabelElement(labelItem) {
@@ -278,7 +282,7 @@ class SimpleImageLabel {
       color,
       name
     } = labelItem
-    this.clearAllLabelActive()
+    this.clearAllLabelActive();
     // 创建label元素
     const labelElement = document.createElement('div');
     labelElement.className = 'label-item';
@@ -289,7 +293,7 @@ class SimpleImageLabel {
     labelElement.style.height = decimalToPercent(height);
     labelElement.style.position = 'absolute';
     labelElement.style.border = '1px solid rgb(58,238,121)';
-    labelElement.style.backgroundColor = 'rgba(191,191,191,.5)'
+    labelElement.style.backgroundColor = 'rgba(191,191,191,.5)';
     labelElement.style.zIndex = this.labels.length;
     if (color) {
       labelElement.style.borderColor = color;
@@ -307,26 +311,26 @@ class SimpleImageLabel {
     labelText.className = 'label-text';
     labelText.innerText = name;
     if (name) {
-      labelText.style.display = 'block'
+      labelText.style.display = 'block';
       if (color) {
         labelText.style.color = color;
       }
     }
     labelElement.appendChild(labelText);
-    this.labelsContainer.appendChild(labelElement)
+    this.labelsContainer.appendChild(labelElement);
   }
 
   // 计算两点的宽高
   calc(labelItem, startPoint, endPoint) {
     // 如果开始与结束的点一样，则不进行任何操作
     if (!isEqual(startPoint, endPoint)) {
-      labelItem.width = endPoint.x - startPoint.x
-      labelItem.height = endPoint.y - startPoint.y
+      labelItem.width = endPoint.x - startPoint.x;
+      labelItem.height = endPoint.y - startPoint.y;
       if (labelItem.uuid && !this.getLabelByUuid(labelItem.uuid)) {
         // 添加到labels
-        this.labels.push(labelItem)
+        this.labels.push(labelItem);
       } else {
-        this.changeLabelSize(labelItem, endPoint)
+        this.changeLabelSize(labelItem, endPoint);
       }
     }
   }
@@ -343,7 +347,7 @@ class SimpleImageLabel {
       width,
       height,
       uuid
-    } = labelItem
+    } = labelItem;
 
     if (!this.resizeDotName) {
       const w = Math.abs(width);
@@ -364,8 +368,8 @@ class SimpleImageLabel {
         label.style.height = decimalToPercent(_h < 0 ? 0 : _h);
       }
       if (this.resizeDotName.includes('s')) {
-        const _h = endPoint.y - y
-        label.style.height = decimalToPercent(_h <= 0 ? 0 : _h)
+        const _h = endPoint.y - y;
+        label.style.height = decimalToPercent(_h <= 0 ? 0 : _h);
       }
       if (this.resizeDotName.includes('w')) {
         const _l = (this.labelItemTemp.x + this.labelItemTemp.width) - endPoint.x <= 0 ? this.labelItemTemp.x + this.labelItemTemp.width : endPoint.x;
@@ -382,7 +386,7 @@ class SimpleImageLabel {
       y: percentOrPixelToDecimal(label.style.top),
       height: percentOrPixelToDecimal(label.style.height),
       width: percentOrPixelToDecimal(label.style.width),
-    }
+    };
     this.setLabelByUuid(uuid, attr);
   }
 
@@ -454,7 +458,9 @@ class SimpleImageLabel {
     }
     // 设置当前label的激活状态
     label.classList.add('label-item-active');
-    this.labelClick(this.getLabelByUuid(uuid));
+    if (this.labelClick && typeof this.labelClick === 'function') {
+      this.labelClick(this.getLabelByUuid(uuid));
+    }
   }
 
   // 根据dot获取label
@@ -462,7 +468,7 @@ class SimpleImageLabel {
     const dotType = e.target.className.replace('resize-dot resize-dot-', '');
     this.clearAllLabelActive();
     this.setLabelActive(e.target.parentNode.id);
-    return dotType
+    return dotType;
   }
 
   // 鼠标移入label
@@ -480,12 +486,12 @@ class SimpleImageLabel {
     if (!label) {
       return;
     }
-    let textEl = isText ? label.querySelector('.label-text') : null
+    let textEl = isText ? label.querySelector('.label-text') : null;
     if (isText) {
       textEl.onmousedown = (e) => this.dragStart(e);
       textEl.onmousemove = (e) => this.dragLabel(e);
       textEl.onmouseup = (e) => this.dragEnd(e);
-      return
+      return;
     }
     label.onmousedown = (e) => this.dragStart(e);
     label.onmousemove = (e) => this.dragLabel(e);
@@ -497,14 +503,14 @@ class SimpleImageLabel {
     if (!label) {
       return;
     }
-    let textEl = isText ? label.querySelector('.label-text') : null
+    let textEl = isText ? label.querySelector('.label-text') : null;
     label.onmousedown = null;
     label.onmousemove = null;
     label.onmouseup = null;
     if (isText) {
-      textEl.onmousedown = null
-      textEl.onmousemove = null
-      textEl.onmouseup = null
+      textEl.onmousedown = null;
+      textEl.onmousemove = null;
+      textEl.onmouseup = null;
     }
   }
 
@@ -526,7 +532,7 @@ class SimpleImageLabel {
   dragLabel(e) {
     e.preventDefault()
     if (!this.labelRelativePointContainer.x || !this.labelRelativePointContainer.y) {
-      return
+      return;
     }
     const label = document.getElementById(e.target.id || e.target.parentNode.id);
     // 拖拽事件获取拖拽最终的坐标
@@ -564,12 +570,12 @@ class SimpleImageLabel {
     label.style.cursor = 'default';
     this.labels.forEach(item => {
       if (item.uuid === e.target.id) {
-        item.x = percentOrPixelToDecimal(label.style.left)
-        item.y = percentOrPixelToDecimal(label.style.top)
+        item.x = percentOrPixelToDecimal(label.style.left);
+        item.y = percentOrPixelToDecimal(label.style.top);
       }
     })
-    this.labelRelativePointContainer.x = null
-    this.labelRelativePointContainer.y = null
+    this.labelRelativePointContainer.x = null;
+    this.labelRelativePointContainer.y = null;
     // 恢复label的z-index
     label.style.zIndex = this.defaultZIndex;
   }
@@ -581,27 +587,58 @@ class SimpleImageLabel {
 
   // 获取激活的label
   activeLabel() {
-    const uuid = document.querySelector('.label-item-active').id
-    return this.labels.find(item => item.uuid === uuid)
+    const uuid = document.querySelector('.label-item-active').id;
+    return this.labels.find(item => item.uuid === uuid);
   }
 
   // 重新设置图片
   setImage(imageUrl) {
-    this.removeAllLabels()
+    this.removeAllLabels();
     this.imageUrl = imageUrl;
-    this.init()
+    this.init();
   }
 
   // 重设labels
   setLabels(labels) {
     this.labels = labels;
-    this.init()
+    this.init();
   }
 
   // 获取图片原始大小
   getImageInfo() {
-    return this.imageInfo
+    return this.imageInfo;
   }
+
+  // 获取默认坐标{x: 左上顶点的x轴，y:左上顶点的y轴，x1:右下顶点的x轴，y1:右下顶点的y轴}
+  getCoordinate(label) {
+    const { height, width } = this.imageInfo;
+    return {
+      x: label.x * width,
+      y: label.y * height,
+      x1: (label.x + label.width) * width,
+      y1: (label.y + label.height) * height
+    }
+  }
+
+  // 获取所有的默认坐标
+  getLabelsCoordinate() {
+    return this.labels.map(label => this.getCoordinate(label));
+  }
+
+  // 转换为YOLO坐标[label中心x轴 / 图像总宽度，label中心y轴 / 图像总宽度，label宽百分比（相对于图片宽），label高百分比（相对于图片的高）]
+  convertToYoloCoordinate(label) {
+    const coordinate = this.getCoordinate(label)
+    const { height, width } = this.imageInfo;
+    const labelCenterX = (coordinate.x + coordinate.x1) / 2;
+    const labelCenterY = (coordinate.y + coordinate.y1) / 2;
+    return [labelCenterX / width, labelCenterY / height, label.width, label.height]
+  }
+
+  // 获取所有labels的YOLO坐标集合
+  getLabelsYoloCoordinate() {
+    return this.labels.map(label => this.convertToYoloCoordinate(label));
+  }
+
 }
 
 export default SimpleImageLabel;

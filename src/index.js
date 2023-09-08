@@ -61,13 +61,17 @@ const imageLabelContent = new SimpleImageLabel({
   imageUrl: img,
   labels: initLabels,
   contextmenu: (e) => {
-    console.log(e)
+    
   },
   error: (err) => {
     console.log(err);
   },
   labelClick: (label) => {
-    console.log(label)
+    console.log('Current clicked label : ', label);
+    const coord = imageLabelContent.getLabelsCoordinate()
+    console.log('All labels coord : ', coord)
+    const yoloCoord = imageLabelContent.getLabelsYoloCoordinate()
+    console.log('All YOLO coord : ', yoloCoord);
   },
 })
 
