@@ -10,6 +10,7 @@
     "start": "parcel index.html",
     "build": "parcel build --no-source-maps --no-cache --detailed-report && terser libs/simpleImageLabel.js -c passes=2 --compress --mangle --output ./libs/simpleImageLabel.js",
     "build:html": "parcel build index.html --dist-dir html --no-source-maps --no-cache --detailed-report",
+    "deploy": "./deploy.sh html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "king6180@gmail.com",
