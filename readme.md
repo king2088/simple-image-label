@@ -151,31 +151,33 @@ pnpm run build
 ## API
 
 ### `SimpleImageLabel options`
-| Property      | Type       | Description       |
-| ------------- | ---------- | ----------------- |
-| `el`          | `string`   | Html element id   |
-| `imageUrl`    | `string`   | Image path        |
-| `labels`      | `array`    | default labels    |
-| `contextmenu` | `function` | right click event |
-| `labelClick`  | `function` | left click event  |
-| `error`       | `function` | error event       |
+| Property      | Type       | Description                   |
+| ------------- | ---------- | ----------------------------- |
+| `el`          | `string`   | Html element id               |
+| `imageUrl`    | `string`   | Image path                    |
+| `labels`      | `array`    | default labels                |
+| `readOnly`    | `boolean`  | Enable/Disable read only mode |
+| `contextmenu` | `function` | right click event             |
+| `labelClick`  | `function` | left click event              |
+| `error`       | `function` | error event                   |
 
 
 ### `SimpleImageLabel function`
-| function                         | params       | Description                     |
-| -------------------------------- | ------------ | ------------------------------- |
-| `getLabels()`                    | -            | Get all labels                  |
-| `activeLabel()`                  | -            | Get active label                |
-| `setImage(imageUrl)`             | `imageUrl`   | Set image                       |
-| `setLabels(labels)`              | `labels`     | Set labels                      |
-| `getImageInfo()`                 | -            | Get image width and height      |
-| `getCoordinate(label)`           | `label`      | Get label coordinate            |
-| `getLabelsCoordinate()`          | -            | Get all labels coordinate       |
-| `convertToYoloCoordinate(label)` | `label`      | Get label YOLO coordinate       |
-| `getLabelsYoloCoordinate()`      | -            | Get all labels YOLO coordinate  |
-| `setLabelActive(uuid)`           | `uuid`       | Set label active status by uuid |
-| `clearAllLabelActive()`          | -            | Clear active status             |
-| `removeAllLabels()`              | -            | Remove all labels               |
-| `removeLabelByUuid(uuid)`        | `uuid`       | Remove a label by uuid          |
-| `setLabelByUuid(uuid, attr)`     | `uuid, attr` | Set label attr by uuid          |
-| `getLabelByUuid(uuid)`           | `uuid`       | Get label by uuid               |
+| function                         | params       | Description                                   |
+| -------------------------------- | ------------ | --------------------------------------------- |
+| `getLabels()`                    | -            | Get all labels                                |
+| `activeLabel()`                  | -            | Get active label                              |
+| `setImage(imageUrl)`             | `imageUrl`   | Set image                                     |
+| `setLabels(labels)`              | `labels`     | Set labels                                    |
+| `getImageInfo()`                 | -            | Get image width and height                    |
+| `getCoordinate(label)`           | `label`      | Get label coordinate                          |
+| `getLabelsCoordinate()`          | -            | Get all labels coordinate                     |
+| `convertToYoloCoordinate(label)` | `label`      | Get label YOLO coordinate                     |
+| `getLabelsYoloCoordinate()`      | -            | Get all labels YOLO coordinate                |
+| `setLabelActive(uuid)`           | `uuid`       | Set label active status by uuid               |
+| `clearAllLabelActive()`          | -            | Clear active status                           |
+| `removeAllLabels()`              | -            | Remove all labels                             |
+| `removeLabelByUuid(uuid)`        | `uuid`       | Remove a label by uuid                        |
+| `setLabelByUuid(uuid, attr)`     | `uuid, attr` | Set label attr by uuid. `attr` type is object |
+| `getLabelByUuid(uuid)`           | `uuid`       | Get label by uuid                             |
+| `setReadOnly(readOnly)`          | `readOnly`   | Set read only mode.`readOnly` type is boolean |

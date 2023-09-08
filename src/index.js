@@ -10,6 +10,7 @@ const setNameBtn = document.getElementById('set-name-btn')
 const setColorBtn = document.getElementById('set-color-btn')
 const defaultCoordEl = document.getElementById('default-coord')
 const yoloCoordEl = document.getElementById('yolo-coord')
+const readOnlyBtn = document.getElementById('read-only-btn')
 
 const initLabels = [{
   color: 'red',
@@ -138,6 +139,19 @@ setColorBtn.onclick = () => {
       color
     })
   }
+}
+
+readOnlyBtn.innerText = 'Enable read only'
+readOnlyBtn.onclick = () => {
+  console.log('imageLabelContent.readOnly', imageLabelContent.readOnly);
+  const readOnly = !imageLabelContent.readOnly;
+  if (readOnly) {
+    readOnlyBtn.innerText = 'Disable read only'
+    clear()
+  } else {
+    readOnlyBtn.innerText = 'Enable read only'
+  }
+  imageLabelContent.setReadOnly(readOnly)
 }
 
 function setImageAndLabels(image, labels) {

@@ -24,6 +24,8 @@ class SimpleImageLabel {
     this.contextmenu = options.contextmenu;
     // 发生错误的回调
     this.error = options.error;
+    // 只读
+    this.readOnly = options.readOnly || false;
     // 鼠标按下时
     this.isMouseDown = false;
     // labels容器，即id为labelsContainer的div
@@ -155,15 +157,37 @@ class SimpleImageLabel {
         this.contextmenu(e)
       }
     };
+    if (this.readOnly) {
+      window.removeEventListener('resize', this.resize.bind(this), false);
+      this.labelsContainer.style.cursor = 'default';
+      this.clearAllLabelActive();
+    } else {
+      this.labelsContainer.style.cursor = 'crosshair';
+    }
     // 监听浏览器缩放,改变label的宽高
-    window.addEventListener('resize', (e) => {
-      this.$w = this.labelsContainer.clientWidth;
-      this.$h = this.labelsContainer.clientHeight;
-      this.resizeImage();
+    window.addEventListener('resize', this.resize.bind(this), false)
+    this.resizeDotDisplayStatus()
+  }
+
+  resize() {
+    this.$w = this.labelsContainer.clientWidth;
+    this.$h = this.labelsContainer.clientHeight;
+    this.resizeImage();
+  }
+
+  resizeDotDisplayStatus() {
+    const allResizeDot = document.querySelectorAll('.resize-dot')
+    allResizeDot.forEach(el => {
+      if (this.readOnly) {
+        el.style.display = 'none';
+      } else {
+        el.style.display = 'block';
+      }
     })
   }
 
   mousedown(e) {
+    if(this.readOnly) return;
     if (e.button !== 0) return; // 不是左键点击则不操作
     this.isMouseDown = true;
     const isLabelText = e.target.className.includes('label-text');
@@ -212,6 +236,7 @@ class SimpleImageLabel {
   }
 
   mousemove(e) {
+    if(this.readOnly) return;
     const isLabelText = e.target.className.includes('label-text');
     const isLabelItem = e.target.className.includes('label-item');
     const isResizeDot = e.target.className.includes('resize-dot');
@@ -242,6 +267,7 @@ class SimpleImageLabel {
   }
 
   mouseup(e) {
+    if(this.readOnly) return;
     const clientLeft = e.clientX - this.getLabelsContainerRelativePoints().x;
     const clientTop = e.clientY - this.getLabelsContainerRelativePoints().y;
     let x = clientLeft / this.$w;
@@ -338,9 +364,7 @@ class SimpleImageLabel {
   // 动态改变label的宽高
   changeLabelSize(labelItem, endPoint) {
     const label = document.getElementById(labelItem.uuid);
-    if (!label) {
-      return;
-    }
+    if (!label) return;
     const {
       x,
       y,
@@ -478,19 +502,16 @@ class SimpleImageLabel {
 
   // 鼠标移入label
   mouseEnterLabel(uuid) {
+    if (this.readOnly) return;
     const label = document.getElementById(uuid);
-    if (!label) {
-      return;
-    }
+    if (!label) return;
     label.style.cursor = 'default';
   }
 
   // 拖动事件
   dragListen(uuid, isText = false) {
     const label = document.getElementById(uuid);
-    if (!label) {
-      return;
-    }
+    if (!label) return;
     let textEl = isText ? label.querySelector('.label-text') : null;
     if (isText) {
       textEl.onmousedown = (e) => this.dragStart(e);
@@ -505,9 +526,7 @@ class SimpleImageLabel {
 
   removeDragListen(uuid, isText = false) {
     const label = document.getElementById(uuid);
-    if (!label) {
-      return;
-    }
+    if (!label) return;
     let textEl = isText ? label.querySelector('.label-text') : null;
     label.onmousedown = null;
     label.onmousemove = null;
@@ -521,10 +540,9 @@ class SimpleImageLabel {
 
   // 监听拖拽事件
   dragStart(e) {
+    if (this.readOnly) return;
     const label = document.getElementById(e.target.id || e.target.parentNode.id);
-    if (!label) {
-      return;
-    }
+    if (!label) return;
     label.style.cursor = 'move';
     this.labelRelativePointContainer.x = e.pageX - label.offsetLeft;
     this.labelRelativePointContainer.y = e.pageY - label.offsetTop;
@@ -535,18 +553,13 @@ class SimpleImageLabel {
 
   // 拖拽label
   dragLabel(e) {
+    if(this.readOnly) return;
     e.preventDefault()
-    if (!this.labelRelativePointContainer.x || !this.labelRelativePointContainer.y) {
-      return;
-    }
+    if (!this.labelRelativePointContainer.x || !this.labelRelativePointContainer.y) return;
     const label = document.getElementById(e.target.id || e.target.parentNode.id);
     // 拖拽事件获取拖拽最终的坐标
-    if (!label) {
-      return;
-    }
-    if (label.style.cursor === 'default') {
-      return;
-    }
+    if (!label) return;
+    if (label.style.cursor === 'default') return;
     const currentLabelWidth = label.style.width ? percentOrPixelToDecimal(label.style.width) : 0;
     const currentLabelHeight = label.style.height ? percentOrPixelToDecimal(label.style.height) : 0;
 
@@ -568,10 +581,9 @@ class SimpleImageLabel {
 
   // 监听拖拽结束事件
   dragEnd(e) {
+    if(this.readOnly) return;
     const label = document.getElementById(e.target.id || e.target.parentNode.id);
-    if (!label) {
-      return;
-    }
+    if (!label) return;
     label.style.cursor = 'default';
     this.labels.forEach(item => {
       if (item.uuid === e.target.id) {
@@ -616,7 +628,10 @@ class SimpleImageLabel {
 
   // 获取默认坐标{x: 左上顶点的x轴，y:左上顶点的y轴，x1:右下顶点的x轴，y1:右下顶点的y轴}
   getCoordinate(label) {
-    const { height, width } = this.imageInfo;
+    const {
+      height,
+      width
+    } = this.imageInfo;
     return {
       x: label.x * width,
       y: label.y * height,
@@ -633,7 +648,10 @@ class SimpleImageLabel {
   // 转换为YOLO坐标[label中心x轴 / 图像总宽度，label中心y轴 / 图像总宽度，label宽百分比（相对于图片宽），label高百分比（相对于图片的高）]
   convertToYoloCoordinate(label) {
     const coordinate = this.getCoordinate(label)
-    const { height, width } = this.imageInfo;
+    const {
+      height,
+      width
+    } = this.imageInfo;
     const labelCenterX = (coordinate.x + coordinate.x1) / 2;
     const labelCenterY = (coordinate.y + coordinate.y1) / 2;
     return [labelCenterX / width, labelCenterY / height, label.width, label.height]
@@ -642,6 +660,12 @@ class SimpleImageLabel {
   // 获取所有labels的YOLO坐标集合
   getLabelsYoloCoordinate() {
     return this.labels.map(label => this.convertToYoloCoordinate(label));
+  }
+  
+  // 设置是否为只读
+  setReadOnly(readOnly) {
+    this.readOnly = readOnly;
+    this.labelAreaEvent()
   }
 
 }
