@@ -1,5 +1,5 @@
-import SimpleImageLabel from './simpleImageLabel'
-
+import SimpleImageLabel from '../libs/simpleImageLabel'
+// const SimpleImageLabel = require('../libs/simpleImageLabel').default
 import img from '../static/1.jpg'
 import img2 from '../static/2.jpg'
 
@@ -95,7 +95,6 @@ const imageLabelContent = new SimpleImageLabel({
     setColorBtn.disabled = false
   },
 })
-
 
 deleteBtn.disabled = true
 setNameBtn.disabled = true
