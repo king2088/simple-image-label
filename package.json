@@ -9,7 +9,7 @@
   "scripts": {
     "start": "parcel index.html",
     "build": "parcel build --no-source-maps --no-cache --detailed-report && terser libs/simpleImageLabel.js -c passes=2 --compress --mangle --output ./libs/simpleImageLabel.js",
-    "build:html": "parcel build index.html --dist-dir html --no-source-maps --no-cache --detailed-report",
+    "build:html": "parcel build index.html --dist-dir html --public-url simple-image-label --no-source-maps --no-cache --detailed-report",
     "deploy": "git subtree push --prefix html origin pages",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
