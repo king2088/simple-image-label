@@ -17,7 +17,7 @@ yarn add simple-image-label
 # pnpm
 pnpm add simple-image-label
 ```
-### Usage
+#### Use in JavaScript
 
 ```html
 <div id="YourElementId"></div>
@@ -45,6 +45,76 @@ const simpleImageLabel = new SimpleImageLabe({
     }
 });
 ```
+
+#### Use in vue3
+
+```html
+<template>
+    <div id="YourElementId"></div>
+</template>
+<script setup>
+import SimpleImageLabel from 'simple-image-label'
+import { ref, onMounted } from 'vue';
+const simpleImageLabel = ref(null);
+onMounted(() => {
+    simpleImageLabel.value = new SimpleImageLabel({
+        el: 'YourElementId'
+        imageUrl: props.imageUrl,
+        labels: props.labels,
+        contextmenu: (e) => {
+            emit('contextmenu', e)
+        },
+        labelClick: (label) => {
+            emit('labelClick', label)
+        },
+        error: (e) => {
+            emit('error', e)
+        }
+    });
+})
+</script>
+```
+
+#### Use in React
+```jsx
+import SimpleImageLabel from 'simple-image-label';
+import img from './x.png'
+import { useEffect } from 'react';
+const ImageLabelComponent = () => {
+    let simpleImageLabel = null
+    useEffect(() => {
+        initSimpleDom()
+    }, [])
+    function initSimpleDom() {
+        simpleImageLabel = new SimpleImageLabel({
+            el: 'YourElementId',
+            imageUrl: img,
+            labels: [],
+            contextmenu: (e) => {
+                console.log(e);
+            },
+            labelClick: (label) => {
+                console.log(label);
+            },
+            error: (e) => {
+                console.log(e);
+            }
+        })
+    }
+    function getAllLabels() {
+        const labels = simpleImageLabel.getLabels()
+        console.log('labels', labels);
+    }
+    return (
+        <div>
+            <div id="YourElementId"></div>
+            <button onClick={getAllLabels}>Get all labels</button>
+        </div>
+    );
+}
+export default ImageLabelComponent;
+```
+
 
 ## Develop & Install & Run demo
 
