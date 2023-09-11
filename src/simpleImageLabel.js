@@ -8,7 +8,7 @@ import {
   getImageInfo
 } from './utils';
 
-import './style.less'
+import './style.less';
 
 class SimpleImageLabel {
   constructor(options) {
@@ -121,7 +121,7 @@ class SimpleImageLabel {
         label.uuid = uuidGenerate();
       }
       this.createLabelElement(label);
-    })
+    });
   }
 
   // 事件
@@ -165,8 +165,8 @@ class SimpleImageLabel {
       this.labelsContainer.style.cursor = 'crosshair';
     }
     // 监听浏览器缩放,改变label的宽高
-    window.addEventListener('resize', this.resize.bind(this), false)
-    this.resizeDotDisplayStatus()
+    window.addEventListener('resize', this.resize.bind(this), false);
+    this.resizeDotDisplayStatus();
   }
 
   resize() {
@@ -176,14 +176,14 @@ class SimpleImageLabel {
   }
 
   resizeDotDisplayStatus() {
-    const allResizeDot = document.querySelectorAll('.resize-dot')
+    const allResizeDot = document.querySelectorAll('.resize-dot');
     allResizeDot.forEach(el => {
       if (this.readOnly) {
         el.style.display = 'none';
       } else {
         el.style.display = 'block';
       }
-    })
+    });
   }
 
   mousedown(e) {
@@ -292,7 +292,6 @@ class SimpleImageLabel {
   getLabelsContainerRelativePoints() {
     const labelExternalEl = document.querySelector('.__simple-image-label__');
     return {
-      // body的宽高 - 当前labelsContainer容器的宽高 = labelsContainer容器外的宽高，labelsContainer容器外的宽高 / 2 = labelsContainer容器与浏览器最左侧的距离
       x: labelExternalEl.getBoundingClientRect().x,
       y: labelExternalEl.getBoundingClientRect().y
     };
@@ -307,7 +306,7 @@ class SimpleImageLabel {
       uuid,
       color,
       name
-    } = labelItem
+    } = labelItem;
     this.clearAllLabelActive();
     // 创建label元素
     const labelElement = document.createElement('div');
@@ -331,7 +330,7 @@ class SimpleImageLabel {
       const labelDragElement = document.createElement('div');
       labelDragElement.className = `resize-dot resize-dot-${resizeDotClass}`;
       labelElement.appendChild(labelDragElement);
-    })
+    });
     // 设置文字
     const labelText = document.createElement('div');
     labelText.className = 'label-text';
@@ -441,9 +440,9 @@ class SimpleImageLabel {
             labelNameEl.style.color = item.color;
           }
           // }
-        })
+        });
       }
-    })
+    });
   }
 
   // 根据uuid删除label
@@ -463,7 +462,7 @@ class SimpleImageLabel {
     const labels = document.querySelectorAll('.label-item');
     labels.forEach(item => {
       item.parentNode.removeChild(item);
-    })
+    });
     this.labels = [];
   }
 
@@ -475,7 +474,7 @@ class SimpleImageLabel {
     if (labelElements.length) {
       labelElements.forEach(item => {
         item.classList.remove('label-item-active');
-      })
+      });
     }
   }
 
@@ -590,7 +589,7 @@ class SimpleImageLabel {
         item.x = percentOrPixelToDecimal(label.style.left);
         item.y = percentOrPixelToDecimal(label.style.top);
       }
-    })
+    });
     this.labelRelativePointContainer.x = null;
     this.labelRelativePointContainer.y = null;
     // 恢复label的z-index
@@ -637,7 +636,7 @@ class SimpleImageLabel {
       y: label.y * height,
       x1: (label.x + label.width) * width,
       y1: (label.y + label.height) * height
-    }
+    };
   }
 
   // 获取所有的默认坐标
@@ -647,14 +646,14 @@ class SimpleImageLabel {
 
   // 转换为YOLO坐标[label中心x轴 / 图像总宽度，label中心y轴 / 图像总宽度，label宽百分比（相对于图片宽），label高百分比（相对于图片的高）]
   convertToYoloCoordinate(label) {
-    const coordinate = this.getCoordinate(label)
+    const coordinate = this.getCoordinate(label);
     const {
       height,
       width
     } = this.imageInfo;
     const labelCenterX = (coordinate.x + coordinate.x1) / 2;
     const labelCenterY = (coordinate.y + coordinate.y1) / 2;
-    return [labelCenterX / width, labelCenterY / height, label.width, label.height]
+    return [labelCenterX / width, labelCenterY / height, label.width, label.height];
   }
 
   // 获取所有labels的YOLO坐标集合
@@ -665,7 +664,7 @@ class SimpleImageLabel {
   // 设置是否为只读
   setReadOnly(readOnly) {
     this.readOnly = readOnly;
-    this.labelAreaEvent()
+    this.labelAreaEvent();
   }
 
 }
