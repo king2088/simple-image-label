@@ -1,7 +1,7 @@
 # simple-image-label
 
 [View English readme](README.md) | [查看中文版readme](README-zh.md)  
-Simple image label use in JavaScript , support YOLO label point for object detection or deep-learning.
+Simple image annotate use in JavaScript , support YOLO and VOC annotate point for object detection or deep-learning.
 
 ## Preview
 

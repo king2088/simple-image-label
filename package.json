@@ -1,8 +1,8 @@
 {
   "name": "simple-image-label",
   "private": false,
-  "version": "0.0.6",
-  "description": "Javascript image label, use in deep learning",
+  "version": "0.0.7",
+  "description": "Javascript image annotate, use in deep learning",
   "source": "src/simpleImageLabel.js",
   "main": "libs/simpleImageLabel.js",
   "module": "libs/simpleImageLabel.module.js",
@@ -31,8 +31,8 @@
   "homepage": "https://github.com/king2088/simple-image-label",
   "keywords": [
     "image",
-    "label",
-    "image label",
+    "annotate",
+    "image annotate",
     "YOLO",
     "object detection",
     "deep-learning"
