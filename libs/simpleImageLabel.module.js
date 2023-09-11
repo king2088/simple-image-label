@@ -299,7 +299,6 @@ class $4b8e7a2fa3c0207e$var$SimpleImageLabel {
     getLabelsContainerRelativePoints() {
         const labelExternalEl = document.querySelector(".__simple-image-label__");
         return {
-            // body的宽高 - 当前labelsContainer容器的宽高 = labelsContainer容器外的宽高，labelsContainer容器外的宽高 / 2 = labelsContainer容器与浏览器最左侧的距离
             x: labelExternalEl.getBoundingClientRect().x,
             y: labelExternalEl.getBoundingClientRect().y
         };
@@ -564,7 +563,7 @@ class $4b8e7a2fa3c0207e$var$SimpleImageLabel {
     getImageInfo() {
         return this.imageInfo;
     }
-    // 获取默认坐标{x: 左上顶点的x轴，y:左上顶点的y轴，x1:右下顶点的x轴，y1:右下顶点的y轴}
+    // 获取默认 (voc) 坐标{x: 左上顶点的x轴，y:左上顶点的y轴，x1:右下顶点的x轴，y1:右下顶点的y轴}
     getCoordinate(label) {
         const { height: height, width: width } = this.imageInfo;
         return {

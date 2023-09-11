@@ -1,7 +1,7 @@
 {
   "name": "simple-image-label",
   "private": false,
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Javascript image label, use in deep learning",
   "source": "src/simpleImageLabel.js",
   "main": "libs/simpleImageLabel.js",

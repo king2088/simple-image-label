@@ -625,7 +625,7 @@ class SimpleImageLabel {
     return this.imageInfo;
   }
 
-  // 获取默认坐标{x: 左上顶点的x轴，y:左上顶点的y轴，x1:右下顶点的x轴，y1:右下顶点的y轴}
+  // 获取默认 (voc) 坐标{x: 左上顶点的x轴，y:左上顶点的y轴，x1:右下顶点的x轴，y1:右下顶点的y轴}
   getCoordinate(label) {
     const {
       height,
